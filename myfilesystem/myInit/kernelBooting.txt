@@ -1,0 +1,28 @@
+// create file system folders
+
+    mkdir -p initramfs/{bin,sbin,etc,proc,sys,usr/bin,usr/sbin}
+
+// put executable init under initramfs folder.
+
+// create compressed version of initramfs 
+
+    find . | cpio -o -H newc | gzip > ../initramfs.img.gz
+
+// configure config.txt
+```
+enable_uart=1
+initramfs initramfs.img.gz followkernel
+kernel=kernel7.img
+hdmi_force_hotplug=1
+hdmi_group=1
+hdmi_mode=1
+```
+
+// configure cmdline.txt
+```
+initrd=initramfs.img.gz followkernel console=serial0,115200
+```
+
+
+Kernel will boot and mount initramfs file system and then it will
+run init executable which you put under initramfs.
