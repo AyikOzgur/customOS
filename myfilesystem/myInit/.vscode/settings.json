@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "mount.h": "c",
+        "stat.h": "c"
+    }
+}
