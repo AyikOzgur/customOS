@@ -2,6 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <stdlib.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
 
@@ -39,17 +40,32 @@ int main()
     else
     {
         printf("Root file system switched.\n");
+        chdir("/");
+    }
+
+    // Define the library path you want to set
+    const char *libraryPath = "/lib";
+
+    // Create a string with the new LD_LIBRARY_PATH value
+    char ldLibraryPath[1024];
+    snprintf(ldLibraryPath, sizeof(ldLibraryPath), "LD_LIBRARY_PATH=%s", libraryPath);
+
+    // Set the environment variable using putenv
+    if (putenv(ldLibraryPath) != 0)
+    {
+        perror("putenv");
+        return 1;
     }
 
     char input[MAX_INPUT_SIZE];
-    
+
     while (1) 
     {
         char pwd[1024];
         getcwd(pwd, sizeof(pwd));
-        printf("mySell @ %s > ", pwd);
+        printf("myShell @ %s > ", pwd);
         fflush(stdout);
-        
+
         if (fgets(input, sizeof(input), stdin) == NULL) 
         {
             break;
@@ -71,49 +87,72 @@ int main()
 
         args[argc] = NULL; // Null-terminate the argument list
 
-        if (argc > 0) {
-            pid_t pid = fork();
-
-            if (pid == -1) 
+        if (argc > 0) 
+        {
+            if (strcmp(args[0], "cd") == 0) 
             {
-                perror("fork");
-                return 1;
-            } 
-            else if (pid == 0) 
-            {
-                // Child process
-                if (strcmp(args[0], "cd") == 0)
+                if (args[1] != NULL) 
                 {
-                    chdir(args[1]);
+                    if (chdir(args[1]) == -1) 
+                    {
+                        perror("chdir");
+                    }
                 }
-                else if(strcmp(args[0], "ls") == 0) 
+                else 
                 {
-                    args[0] = "/bin/my_ls";
-                    execlp(args[0], args[0], args[1], args[2], args[3], NULL);
-                    perror("execlp"); // This line will only be reached if execlp fails
-                    return 1;
+                    // Handle 'cd' with no arguments as 'cd ~'
+                    if (chdir(getenv("HOME")) == -1) 
+                    {
+                        perror("chdir");
+                    }
                 }
-                else if(strcmp(args[0], "mkdir") == 0) 
-                {
-                    args[0] = "/bin/my_mkdir";
-                    execlp(args[0], args[0], args[1], args[2], args[3], NULL);
-                    perror("execlp"); // This line will only be reached if execlp fails
-                    return 1;
-                }
-                else
-                {
-                    printf("Invaild command.\n");
-                }
-            } 
+            }
             else 
-            { 
-                // Parent process
-                int status;
-                waitpid(pid, &status, 0);
-                // The parent continues to run after the child process finishes.
+            {
+                pid_t pid = fork();
+
+                if (pid == -1) 
+                {
+                    perror("fork");
+                    return 1;
+                } 
+                else if (pid == 0) 
+                {
+                    // Child process
+                    // Check if the executable is in the current directory
+                    char current_dir_path[1024];
+                    snprintf(current_dir_path, sizeof(current_dir_path), "./%s", args[0]);
+                    if (access(current_dir_path, X_OK) == 0) 
+                    {
+                        execvp(current_dir_path, args);
+                    } 
+                    else 
+                    {
+                        // Check if the executable is in /bin
+                        char bin_path[1024];
+                        snprintf(bin_path, sizeof(bin_path), "/bin/%s", args[0]);
+                        if (access(bin_path, X_OK) == 0) 
+                        {
+                            execvp(bin_path, args);
+                        } 
+                        else 
+                        {
+                            printf("Invalid command.\n");
+                        }
+                    }
+
+                    exit(1); // Terminate the child process
+                } 
+                else 
+                {
+                    // Parent process
+                    int status;
+                    waitpid(pid, &status, 0);
+                    // The parent continues to run after the child process finishes.
+                }
             }
         }
     }
-    
+
     return 0;
 }

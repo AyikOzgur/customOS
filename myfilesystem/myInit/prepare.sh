@@ -13,22 +13,31 @@ arm-linux-gnueabihf-gcc -static -o init init.c
 cp init ../../initramfs/
 
 # go to cd
-cd ../my_cd
-arm-linux-gnueabihf-gcc -static -o my_cd my_cd.c
-cp my_cd ../../initramfs/bin
-cp my_cd /mnt/ext4/bin
+#cd ../cd
+#arm-linux-gnueabihf-gcc -static -o cd cd.c
+#cp cd ../../initramfs/bin
+#cp cd /mnt/ext4/bin
 
 # go to ls
-cd ../my_ls
-arm-linux-gnueabihf-gcc -static -o my_ls my_ls.c
-cp my_ls ../../initramfs/bin
-cp my_ls /mnt/ext4/bin
+cd ../ls
+arm-linux-gnueabihf-gcc -static -o ls ls.c
+cp ls ../../initramfs/bin
+cp ls /mnt/ext4/bin
 
 # go to mkdir
-cd ../my_mkdir
-arm-linux-gnueabihf-gcc -static -o my_mkdir my_mkdir.c
-cp my_mkdir ../../initramfs/bin
-cp my_mkdir /mnt/ext4/bin
+cd ../mkdir
+arm-linux-gnueabihf-gcc -static -o mkdir mkdir.c
+cp mkdir ../../initramfs/bin
+cp mkdir /mnt/ext4/bin
+
+# go to helloApp
+cd ../helloApp
+arm-linux-gnueabihf-gcc -o hello helloApp.c
+cp hello ../../initramfs/home
+sudo cp hello /mnt/ext4/home
+sudo cp hello /mnt/ext4/etc
+sudo cp hello /mnt/ext4/home/ozgur
+
 
 # prepare sd card device node and then initramfs compressed
 cd ../../initramfs
