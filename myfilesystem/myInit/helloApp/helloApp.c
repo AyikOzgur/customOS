@@ -1,8 +1,6 @@
 #include <stdio.h>
-#include <stdlib.h>
 
-int main() 
-{
-    printf("Hello, world!\n");
-    return 0;
+int main() {
+    fprintf(stderr, "This is an error message to stderr.\n");
+    return 1;  // Returning a non-zero value to indicate an error.
 }

@@ -9,14 +9,15 @@
 #define MAX_INPUT_SIZE 1024
 #define MAX_ARGS 64
 
-int main() 
+void mntrootFilePart()
 {
+    // mount main root file system
     const char *source = "/dev/mmcblk0p2";
     const char *target = "/mnt";
     const char *filesystemtype = "ext4";
     unsigned long mountflags = 0;
     const void *data = NULL;
-    sleep(5);
+    sleep(1);
 
     // Create the target mount directory with appropriate permissions
     if (mkdir(target, 0755) != 0) 
@@ -42,7 +43,32 @@ int main()
         printf("Root file system switched.\n");
         chdir("/");
     }
+}
 
+void mntbootPart()
+{
+    // mount main root file system
+    const char *source = "/dev/mmcblk0p1";
+    const char *target = "/boot";
+    const char *filesystemtype = "vfat";
+    unsigned long mountflags = 0;
+    const void *data = NULL;
+    sleep(1);
+
+    // Attempt to mount the device
+    if (mount(source, target, filesystemtype, mountflags, data) != 0) 
+    {
+        perror("mount failed");
+    }
+    else
+        printf("Mounted %s to %s\n", source, target);
+
+}
+
+int main() 
+{
+    mntrootFilePart();
+    mntbootPart();
     // Define the library path you want to set
     const char *libraryPath = "/lib";
 
