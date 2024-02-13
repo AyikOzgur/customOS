@@ -5,6 +5,11 @@
 #include <stdlib.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
 
 #define MAX_INPUT_SIZE 1024
 #define MAX_ARGS 64
@@ -43,6 +48,36 @@ void mntrootFilePart()
         printf("Root file system switched.\n");
         chdir("/");
     }
+
+    // Attempt to mount the /proc filesystem
+    if (mount("proc", "/proc", "proc", 0, NULL) != 0) {
+        // If something went wrong, print out the error
+        printf("Error mounting /proc:");
+        //return EXIT_FAILURE;
+    }
+    else
+    {
+        printf("proc mounted.");
+    }
+
+    // Attempt to mount the devtmpfs on /dev
+    if (mount("devtmpfs", "/dev", "devtmpfs", 0, NULL) != 0) {
+        // If something went wrong, print out the error
+        printf("Error mounting /dev:\n");
+        //return EXIT_FAILURE;
+    }
+    else
+        printf("/dev has been successfully mounted.\n");
+
+    // Attempt to mount the sysfs on /sys
+    if (mount("sysfs", "/sys", "sysfs", 0, NULL) != 0) {
+        // If something went wrong, print out the error
+        printf("Error mounting /sys\n");
+        //return EXIT_FAILURE;
+    }
+    else
+        printf("/sys has been successfully mounted.\n");
+
 }
 
 void mntbootPart()
@@ -65,10 +100,105 @@ void mntbootPart()
 
 }
 
+
+void setup_network() {
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd < 0) {
+        perror("Error opening socket");
+        exit(EXIT_FAILURE);
+    }
+
+    struct ifreq ifr;
+    strcpy(ifr.ifr_name, "eth0");
+
+    struct sockaddr_in* addr = (struct sockaddr_in*)&ifr.ifr_addr;
+    addr->sin_family = AF_INET;
+
+    if (inet_pton(AF_INET, "192.168.0.2", &addr->sin_addr) != 1) {
+        perror("Error setting IP address");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+    if (ioctl(fd, SIOCSIFADDR, &ifr) < 0) {
+        perror("Error setting interface address");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    if (inet_pton(AF_INET, "255.255.255.0", &addr->sin_addr) != 1) {
+        perror("Error setting netmask");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+    if (ioctl(fd, SIOCSIFNETMASK, &ifr) < 0) {
+        perror("Error setting interface netmask");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) {
+        perror("Error getting interface flags");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+    ifr.ifr_flags |= IFF_UP | IFF_RUNNING;
+    if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0) {
+        perror("Error setting interface flags");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    close(fd);
+}
+
+
+void setup_loopback() {
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd < 0) {
+        perror("Error opening socket");
+        exit(EXIT_FAILURE);
+    }
+
+    struct ifreq ifr;
+    memset(&ifr, 0, sizeof(ifr));
+    strcpy(ifr.ifr_name, "lo");
+
+    struct sockaddr_in* addr = (struct sockaddr_in*)&ifr.ifr_addr;
+    addr->sin_family = AF_INET;
+    if (inet_pton(AF_INET, "127.0.0.1", &addr->sin_addr) != 1) {
+        perror("Error setting IP address for lo");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    if (ioctl(fd, SIOCSIFADDR, &ifr) < 0) {
+        perror("Error setting interface address for lo");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) {
+        perror("Error getting interface flags for lo");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    ifr.ifr_flags |= IFF_UP | IFF_RUNNING;
+    if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0) {
+        perror("Error setting interface flags for lo");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    close(fd);
+}
+
 int main() 
 {
     mntrootFilePart();
     mntbootPart();
+    setup_network();
+    setup_loopback();
     // Define the library path you want to set
     const char *libraryPath = "/lib";
 
@@ -160,14 +290,14 @@ int main()
                         if (access(bin_path, X_OK) == 0) 
                         {
                             execvp(bin_path, args);
-                        } 
+                        }
                         else 
                         {
                             printf("Invalid command.\n");
                         }
                     }
 
-                    exit(1); // Terminate the child process
+                    exit(0); // Terminate the child process
                 } 
                 else 
                 {

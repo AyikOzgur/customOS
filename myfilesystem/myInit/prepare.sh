@@ -4,8 +4,8 @@
 sudo mkdir /mnt/fat32
 sudo mkdir /mnt/ext4
 
-sudo mount -t vfat /dev/sdb1 /mnt/fat32
-sudo mount -t ext4 /dev/sdb2 /mnt/ext4
+sudo mount -t vfat /dev/sda1 /mnt/fat32
+sudo mount -t ext4 /dev/sda2 /mnt/ext4
 
 # start from init
 cd ./init
@@ -36,6 +36,24 @@ arm-linux-gnueabihf-gcc -o touch touch.c
 cp touch ../../initramfs/bin
 cp touch /mnt/ext4/bin
 
+# go to clear
+cd ../clear
+arm-linux-gnueabihf-gcc -o clear clear.c
+cp clear ../../initramfs/bin
+cp clear /mnt/ext4/bin
+
+# go to cat
+cd ../cat
+arm-linux-gnueabihf-gcc -o cat cat.c
+cp cat ../../initramfs/bin
+cp cat /mnt/ext4/bin
+
+# go to vi
+cd ../vi
+arm-linux-gnueabihf-gcc -static -o vi vi.c
+cp vi ../../initramfs/bin
+cp vi /mnt/ext4/bin
+
 # go to helloApp
 cd ../helloApp
 arm-linux-gnueabihf-gcc -o hello helloApp.c
@@ -43,6 +61,11 @@ cp hello ../../initramfs/home
 sudo cp hello /mnt/ext4/home
 sudo cp hello /mnt/ext4/etc
 sudo cp hello /mnt/ext4/home/ozgur
+
+# go to netto test
+cd ../netto
+arm-linux-gnueabihf-gcc -o netto netto.c
+sudo cp netto /mnt/ext4/home/ozgur
 
 
 # prepare sd card device node and then initramfs compressed.
