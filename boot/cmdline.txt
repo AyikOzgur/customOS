@@ -1,1 +1,1 @@
-initrd=initramfs.img.gz followkernel console=serial0,115200
+console=serial0,115200
