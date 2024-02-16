@@ -217,96 +217,45 @@ int main()
 
     while (1) 
     {
-        char pwd[1024];
-        getcwd(pwd, sizeof(pwd));
-        printf("myShell @ %s > ", pwd);
-        fflush(stdout);
+        pid_t pid = fork();
 
-        if (fgets(input, sizeof(input), stdin) == NULL) 
+        if (pid == -1) 
         {
-            break;
-        }
-
-        // Remove the trailing newline character
-        input[strcspn(input, "\n")] = '\0';
-
-        char *args[MAX_ARGS];
-        int argc = 0;
-
-        char *token = strtok(input, " ");
-
-        while (token != NULL && argc < MAX_ARGS) 
+            perror("fork");
+            return 1;
+        } 
+        else if (pid == 0) 
         {
-            args[argc++] = token;
-            token = strtok(NULL, " ");
-        }
+            // Child process
+            // Check if the executable is in /bin
+            // Path to the executable you want to run
+            char *path = "/bin/myShell";
 
-        args[argc] = NULL; // Null-terminate the argument list
+            // Arguments array for execve must be terminated by a NULL pointer
+            // Since your executable doesn't require arguments, only include the program name
+            char *argv[] = {path, NULL};
 
-        if (argc > 0) 
-        {
-            if (strcmp(args[0], "cd") == 0) 
+            // Environment variables array, also terminated by a NULL pointer
+            // If you don't need to set any specific environment variables, you can just pass NULL
+            char *envp[] = {NULL};
+
+            // Use execve to execute the program
+            // Note: execve does not return on success, the current program is replaced
+            int status = execve(path, argv, envp);
+            if (status == -1) 
             {
-                if (args[1] != NULL) 
-                {
-                    if (chdir(args[1]) == -1) 
-                    {
-                        perror("chdir");
-                    }
-                }
-                else 
-                {
-                    // Handle 'cd' with no arguments as 'cd ~'
-                    if (chdir(getenv("HOME")) == -1) 
-                    {
-                        perror("chdir");
-                    }
-                }
+                perror("execve failed");
             }
-            else 
-            {
-                pid_t pid = fork();
+            printf("this message should not be seen");
 
-                if (pid == -1) 
-                {
-                    perror("fork");
-                    return 1;
-                } 
-                else if (pid == 0) 
-                {
-                    // Child process
-                    // Check if the executable is in the current directory
-                    char current_dir_path[1024];
-                    snprintf(current_dir_path, sizeof(current_dir_path), "./%s", args[0]);
-                    if (access(current_dir_path, X_OK) == 0) 
-                    {
-                        execvp(current_dir_path, args);
-                    } 
-                    else 
-                    {
-                        // Check if the executable is in /bin
-                        char bin_path[1024];
-                        snprintf(bin_path, sizeof(bin_path), "/bin/%s", args[0]);
-                        if (access(bin_path, X_OK) == 0) 
-                        {
-                            execvp(bin_path, args);
-                        }
-                        else 
-                        {
-                            printf("Invalid command.\n");
-                        }
-                    }
-
-                    exit(0); // Terminate the child process
-                } 
-                else 
-                {
-                    // Parent process
-                    int status;
-                    waitpid(pid, &status, 0);
-                    // The parent continues to run after the child process finishes.
-                }
-            }
+            exit(0); // Terminate the child process
+        } 
+        else 
+        {
+            // Parent process
+            int status;
+            waitpid(pid, &status, 0);
+            // The parent continues to run after the child process finishes.
         }
     }
 

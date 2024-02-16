@@ -70,20 +70,22 @@ void startSender() {
     close(sockfd);
 }
 
-int main() {
-    pid_t pid = fork();
-    if (pid < 0) {
-        printf("fork failed");
-        exit(EXIT_FAILURE);
-    }
-
-    if (pid == 0) {
-        // Child process: Receiver
-        startReceiver();
-    } else {
-        // Parent process: Sender
-        startSender();
-    }
+int main() 
+{
+    //pid_t pid = fork();
+    //if (pid < 0) {
+    //    printf("fork failed");
+    //    exit(EXIT_FAILURE);
+    //}
+//
+    //if (pid == 0) {
+    //    // Child process: Receiver
+    //    startReceiver();
+    //} else {
+    //    // Parent process: Sender
+    //    startSender();
+    //}
+    startReceiver();
 
     return 0;
 }

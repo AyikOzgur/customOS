@@ -12,54 +12,44 @@ cd ./init
 arm-linux-gnueabihf-gcc -static -o init init.c
 cp init ../../initramfs/
 
+# go to myShell
+cd ../myShell
+arm-linux-gnueabihf-gcc -static -o myShell myShell.c
+cp myShell /mnt/ext4/bin
+
 # go to ls
 cd ../ls
 arm-linux-gnueabihf-gcc -o ls ls.c
-cp ls ../../initramfs/bin
 cp ls /mnt/ext4/bin
 
 # go to mkdir
 cd ../mkdir
 arm-linux-gnueabihf-gcc -o mkdir mkdir.c
-cp mkdir ../../initramfs/bin
 cp mkdir /mnt/ext4/bin
 
 # go to rm
 cd ../rm
 arm-linux-gnueabihf-gcc -o rm rm.c
-cp rm ../../initramfs/bin
 cp rm /mnt/ext4/bin
 
 # go to touch
 cd ../touch
 arm-linux-gnueabihf-gcc -o touch touch.c
-cp touch ../../initramfs/bin
 cp touch /mnt/ext4/bin
 
 # go to clear
 cd ../clear
 arm-linux-gnueabihf-gcc -o clear clear.c
-cp clear ../../initramfs/bin
 cp clear /mnt/ext4/bin
 
 # go to cat
 cd ../cat
 arm-linux-gnueabihf-gcc -o cat cat.c
-cp cat ../../initramfs/bin
 cp cat /mnt/ext4/bin
-
-# go to vi
-cd ../vi
-arm-linux-gnueabihf-gcc -static -o vi vi.c
-cp vi ../../initramfs/bin
-cp vi /mnt/ext4/bin
 
 # go to helloApp
 cd ../helloApp
 arm-linux-gnueabihf-gcc -o hello helloApp.c
-cp hello ../../initramfs/home
-sudo cp hello /mnt/ext4/home
-sudo cp hello /mnt/ext4/etc
 sudo cp hello /mnt/ext4/home/ozgur
 
 # go to netto test
@@ -89,7 +79,7 @@ sudo chmod 666 /mnt/ext4/dev/stdout
 sudo mknod /mnt/ext4/dev/stderr c 1 2
 sudo chmod 666 /mnt/ext4/dev/stderr
 
-
+# create initramfs compressed file.
 find . | cpio -o -H newc | gzip > ../initramfs.img.gz
 cd ..
 cp initramfs.img.gz /mnt/fat32
