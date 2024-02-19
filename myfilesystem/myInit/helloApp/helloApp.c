@@ -1,14 +1,17 @@
 #include <stdio.h>
 
-int main() {
+int main()
+{
     char ch;
 
     printf("Enter characters (press 'q' to quit): ");
     fflush(stdout); // Make sure the prompt is displayed before user input
 
-    while ((ch = getchar()) != EOF) {
+    while ((ch = getchar()) != EOF)
+    {
         // Check if the read character is 'q'
-        if (ch == 'q') {
+        if (ch == 'q')
+        {
             printf("\n'q' received, exiting program.\n");
             break; // Exit the loop, thus ending the program
         }
@@ -17,7 +20,8 @@ int main() {
         printf("%c", ch);
 
         // If a newline is entered, print the prompt again for clarity
-        if (ch == '\n') {
+        if (ch == '\n')
+        {
             printf("Enter characters (press 'q' to quit): ");
             fflush(stdout);
         }

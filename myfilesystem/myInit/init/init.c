@@ -25,13 +25,13 @@ void mntrootFilePart()
     sleep(1);
 
     // Create the target mount directory with appropriate permissions
-    if (mkdir(target, 0755) != 0) 
+    if (mkdir(target, 0755) != 0)
     {
         perror("mkdir failed");
     }
 
     // Attempt to mount the device
-    if (mount(source, target, filesystemtype, mountflags, data) != 0) 
+    if (mount(source, target, filesystemtype, mountflags, data) != 0)
     {
         perror("mount failed");
     }
@@ -50,10 +50,11 @@ void mntrootFilePart()
     }
 
     // Attempt to mount the /proc filesystem
-    if (mount("proc", "/proc", "proc", 0, NULL) != 0) {
+    if (mount("proc", "/proc", "proc", 0, NULL) != 0)
+    {
         // If something went wrong, print out the error
         printf("Error mounting /proc:");
-        //return EXIT_FAILURE;
+        // return EXIT_FAILURE;
     }
     else
     {
@@ -61,23 +62,24 @@ void mntrootFilePart()
     }
 
     // Attempt to mount the devtmpfs on /dev
-    if (mount("devtmpfs", "/dev", "devtmpfs", 0, NULL) != 0) {
+    if (mount("devtmpfs", "/dev", "devtmpfs", 0, NULL) != 0)
+    {
         // If something went wrong, print out the error
         printf("Error mounting /dev:\n");
-        //return EXIT_FAILURE;
+        // return EXIT_FAILURE;
     }
     else
         printf("/dev has been successfully mounted.\n");
 
     // Attempt to mount the sysfs on /sys
-    if (mount("sysfs", "/sys", "sysfs", 0, NULL) != 0) {
+    if (mount("sysfs", "/sys", "sysfs", 0, NULL) != 0)
+    {
         // If something went wrong, print out the error
         printf("Error mounting /sys\n");
-        //return EXIT_FAILURE;
+        // return EXIT_FAILURE;
     }
     else
         printf("/sys has been successfully mounted.\n");
-
 }
 
 void mntbootPart()
@@ -91,19 +93,19 @@ void mntbootPart()
     sleep(1);
 
     // Attempt to mount the device
-    if (mount(source, target, filesystemtype, mountflags, data) != 0) 
+    if (mount(source, target, filesystemtype, mountflags, data) != 0)
     {
         perror("mount failed");
     }
     else
         printf("Mounted %s to %s\n", source, target);
-
 }
 
-
-void setup_network() {
+void setup_network()
+{
     int fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd < 0) {
+    if (fd < 0)
+    {
         perror("Error opening socket");
         exit(EXIT_FAILURE);
     }
@@ -111,38 +113,44 @@ void setup_network() {
     struct ifreq ifr;
     strcpy(ifr.ifr_name, "eth0");
 
-    struct sockaddr_in* addr = (struct sockaddr_in*)&ifr.ifr_addr;
+    struct sockaddr_in *addr = (struct sockaddr_in *)&ifr.ifr_addr;
     addr->sin_family = AF_INET;
 
-    if (inet_pton(AF_INET, "192.168.0.2", &addr->sin_addr) != 1) {
+    if (inet_pton(AF_INET, "192.168.0.2", &addr->sin_addr) != 1)
+    {
         perror("Error setting IP address");
         close(fd);
         exit(EXIT_FAILURE);
     }
-    if (ioctl(fd, SIOCSIFADDR, &ifr) < 0) {
+    if (ioctl(fd, SIOCSIFADDR, &ifr) < 0)
+    {
         perror("Error setting interface address");
         close(fd);
         exit(EXIT_FAILURE);
     }
 
-    if (inet_pton(AF_INET, "255.255.255.0", &addr->sin_addr) != 1) {
+    if (inet_pton(AF_INET, "255.255.255.0", &addr->sin_addr) != 1)
+    {
         perror("Error setting netmask");
         close(fd);
         exit(EXIT_FAILURE);
     }
-    if (ioctl(fd, SIOCSIFNETMASK, &ifr) < 0) {
+    if (ioctl(fd, SIOCSIFNETMASK, &ifr) < 0)
+    {
         perror("Error setting interface netmask");
         close(fd);
         exit(EXIT_FAILURE);
     }
 
-    if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) {
+    if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0)
+    {
         perror("Error getting interface flags");
         close(fd);
         exit(EXIT_FAILURE);
     }
     ifr.ifr_flags |= IFF_UP | IFF_RUNNING;
-    if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0) {
+    if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0)
+    {
         perror("Error setting interface flags");
         close(fd);
         exit(EXIT_FAILURE);
@@ -151,10 +159,11 @@ void setup_network() {
     close(fd);
 }
 
-
-void setup_loopback() {
+void setup_loopback()
+{
     int fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd < 0) {
+    if (fd < 0)
+    {
         perror("Error opening socket");
         exit(EXIT_FAILURE);
     }
@@ -163,28 +172,32 @@ void setup_loopback() {
     memset(&ifr, 0, sizeof(ifr));
     strcpy(ifr.ifr_name, "lo");
 
-    struct sockaddr_in* addr = (struct sockaddr_in*)&ifr.ifr_addr;
+    struct sockaddr_in *addr = (struct sockaddr_in *)&ifr.ifr_addr;
     addr->sin_family = AF_INET;
-    if (inet_pton(AF_INET, "127.0.0.1", &addr->sin_addr) != 1) {
+    if (inet_pton(AF_INET, "127.0.0.1", &addr->sin_addr) != 1)
+    {
         perror("Error setting IP address for lo");
         close(fd);
         exit(EXIT_FAILURE);
     }
 
-    if (ioctl(fd, SIOCSIFADDR, &ifr) < 0) {
+    if (ioctl(fd, SIOCSIFADDR, &ifr) < 0)
+    {
         perror("Error setting interface address for lo");
         close(fd);
         exit(EXIT_FAILURE);
     }
 
-    if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) {
+    if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0)
+    {
         perror("Error getting interface flags for lo");
         close(fd);
         exit(EXIT_FAILURE);
     }
 
     ifr.ifr_flags |= IFF_UP | IFF_RUNNING;
-    if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0) {
+    if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0)
+    {
         perror("Error setting interface flags for lo");
         close(fd);
         exit(EXIT_FAILURE);
@@ -193,7 +206,7 @@ void setup_loopback() {
     close(fd);
 }
 
-int main() 
+int main()
 {
     mntrootFilePart();
     mntbootPart();
@@ -215,16 +228,16 @@ int main()
 
     char input[MAX_INPUT_SIZE];
 
-    while (1) 
+    while (1)
     {
         pid_t pid = fork();
 
-        if (pid == -1) 
+        if (pid == -1)
         {
             perror("fork");
             return 1;
-        } 
-        else if (pid == 0) 
+        }
+        else if (pid == 0)
         {
             // Child process
             // Check if the executable is in /bin
@@ -242,15 +255,15 @@ int main()
             // Use execve to execute the program
             // Note: execve does not return on success, the current program is replaced
             int status = execve(path, argv, envp);
-            if (status == -1) 
+            if (status == -1)
             {
                 perror("execve failed");
             }
             printf("this message should not be seen");
 
             exit(0); // Terminate the child process
-        } 
-        else 
+        }
+        else
         {
             // Parent process
             int status;
