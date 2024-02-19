@@ -17,6 +17,11 @@ cd ../myShell
 arm-linux-gnueabihf-gcc -static -o myShell myShell.c
 cp myShell /mnt/ext4/bin
 
+# go to remoteShell
+cd ../remoteShell
+arm-linux-gnueabihf-gcc -static -o remoteShell remoteShell.c
+cp remoteShell /mnt/ext4/bin
+
 # go to ls
 cd ../ls
 arm-linux-gnueabihf-gcc -o ls ls.c

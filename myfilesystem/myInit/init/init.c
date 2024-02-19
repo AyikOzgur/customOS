@@ -242,7 +242,7 @@ int main()
             // Child process
             // Check if the executable is in /bin
             // Path to the executable you want to run
-            char *path = "/bin/myShell";
+            char *path = "/bin/remoteShell";
 
             // Arguments array for execve must be terminated by a NULL pointer
             // Since your executable doesn't require arguments, only include the program name
