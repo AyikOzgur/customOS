@@ -1,4 +1,3 @@
-// udp_receiver.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -11,30 +10,6 @@
 #define RECV_PORT 7033
 #define SEND_PORT 7034
 #define BUFFER_SIZE 1024
-
-void clear_udp_buffer(int sockfd) 
-{
-    char tmpBuffer[1024]; // Temporary buffer for discarding data
-    ssize_t received;
-
-    // Set socket to non-blocking mode
-    fcntl(sockfd, F_SETFL, O_NONBLOCK);
-
-    // Attempt to read until buffer is empty
-    while ((received = recvfrom(sockfd, tmpBuffer, sizeof(tmpBuffer), 0, NULL, 0)) > 0) 
-    {
-        printf(" \r\n");
-        //printf("    \r");
-    }
-
-    // Check if we stopped reading due to no more data or an error
-    if (received < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
-        perror("Error clearing buffer");
-    }
-
-    // Optionally, set socket back to blocking mode if needed
-    fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL, 0) & ~O_NONBLOCK);
-}
 
 
 int main()
@@ -66,7 +41,6 @@ int main()
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
-    clear_udp_buffer(sockfd);
 
     printf("Listening on port %d\n", RECV_PORT);
 
@@ -75,7 +49,6 @@ int main()
 
     while (1)
     {
-        clear_udp_buffer(sockfd);
         FD_ZERO(&readfds);
         FD_SET(sockfd, &readfds);
         FD_SET(STDIN_FILENO, &readfds);
@@ -104,7 +77,8 @@ int main()
         {
             char Buffer[BUFFER_SIZE];
             ssize_t bytesRead = read(STDIN_FILENO, Buffer, sizeof(Buffer) - 1);
-            sendto(sockfd, Buffer, strlen(Buffer), 0, (struct sockaddr *)&destAddr, sizeof(destAddr));
+            if(bytesRead > 0)
+                sendto(sockfd, Buffer, bytesRead, 0, (struct sockaddr *)&destAddr, sizeof(destAddr));
         }
     }
 

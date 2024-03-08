@@ -11,6 +11,12 @@
 #include <sys/ioctl.h>
 #include <net/if.h>
 
+#include <sys/syscall.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <errno.h>
+
+
 #define MAX_INPUT_SIZE 1024
 #define MAX_ARGS 64
 
@@ -107,7 +113,7 @@ void setup_network()
     if (fd < 0)
     {
         perror("Error opening socket");
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 
     struct ifreq ifr;
@@ -120,40 +126,40 @@ void setup_network()
     {
         perror("Error setting IP address");
         close(fd);
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
     if (ioctl(fd, SIOCSIFADDR, &ifr) < 0)
     {
         perror("Error setting interface address");
         close(fd);
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 
     if (inet_pton(AF_INET, "255.255.255.0", &addr->sin_addr) != 1)
     {
         perror("Error setting netmask");
         close(fd);
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
     if (ioctl(fd, SIOCSIFNETMASK, &ifr) < 0)
     {
         perror("Error setting interface netmask");
         close(fd);
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 
     if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0)
     {
         perror("Error getting interface flags");
         close(fd);
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
     ifr.ifr_flags |= IFF_UP | IFF_RUNNING;
     if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0)
     {
         perror("Error setting interface flags");
         close(fd);
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 
     close(fd);
@@ -165,7 +171,7 @@ void setup_loopback()
     if (fd < 0)
     {
         perror("Error opening socket");
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 
     struct ifreq ifr;
@@ -178,21 +184,21 @@ void setup_loopback()
     {
         perror("Error setting IP address for lo");
         close(fd);
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 
     if (ioctl(fd, SIOCSIFADDR, &ifr) < 0)
     {
         perror("Error setting interface address for lo");
         close(fd);
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 
     if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0)
     {
         perror("Error getting interface flags for lo");
         close(fd);
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 
     ifr.ifr_flags |= IFF_UP | IFF_RUNNING;
@@ -200,7 +206,7 @@ void setup_loopback()
     {
         perror("Error setting interface flags for lo");
         close(fd);
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 
     close(fd);
@@ -212,6 +218,7 @@ int main()
     mntbootPart();
     setup_network();
     setup_loopback();
+
     // Define the library path you want to set
     const char *libraryPath = "/lib";
 
@@ -242,7 +249,7 @@ int main()
             // Child process
             // Check if the executable is in /bin
             // Path to the executable you want to run
-            char *path = "/bin/remoteShell";
+            char *path = "/bin/myShell";
 
             // Arguments array for execve must be terminated by a NULL pointer
             // Since your executable doesn't require arguments, only include the program name
