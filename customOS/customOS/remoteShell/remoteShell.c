@@ -16,28 +16,6 @@
 #define SEND_PORT 7033
 #define RECV_PORT 7034
 
-void clear_udp_buffer(int sockfd) 
-{
-    char tmpBuffer[1024]; // Temporary buffer for discarding data
-    ssize_t received;
-
-    // Set socket to non-blocking mode
-    fcntl(sockfd, F_SETFL, O_NONBLOCK);
-
-    // Attempt to read until buffer is empty
-    while ((received = recvfrom(sockfd, tmpBuffer, sizeof(tmpBuffer), 0, NULL, 0)) > 0) {
-        printf("Discarded %zd bytes from buffer\n", received);
-    }
-
-    // Check if we stopped reading due to no more data or an error
-    if (received < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
-        perror("Error clearing buffer");
-    }
-
-    // Optionally, set socket back to blocking mode if needed
-    fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL, 0) & ~O_NONBLOCK);
-}
-
 
 int main()
 {
@@ -77,8 +55,6 @@ int main()
         perror("Sender socket creation failed");
     }
 
-    clear_udp_buffer(sockfd);
-
     // Set up my address for receiving data
     memset(&myAddr, 0, sizeof(myAddr));
     myAddr.sin_family = AF_INET;
@@ -110,9 +86,6 @@ int main()
 
     while (1)
     {
-
-        clear_udp_buffer(sockfd);
-
         char pwd[1024];
         getcwd(pwd, sizeof(pwd));
         char prompt[2048]; // Make sure this buffer is large enough to hold the resulting string
@@ -127,9 +100,6 @@ int main()
         {
             memcpy(command, commandBuffer, messageLen);
         }
-
-
-
 
         // Remove the trailing newline character
         command[strcspn(command, "\n")] = '\0';
@@ -173,7 +143,8 @@ int main()
                         perror("chdir");
                     }
                 }
-            }else if(strcmp(args[0], "clear") == 0)
+            }
+            else if(strcmp(args[0], "clear") == 0)
             {
                 char clearCommand[] = "\033[2J\033[1;1H"; // ANSI escape sequence to clear screen and move cursor to top left
                 sendto(sockfd, clearCommand, sizeof(clearCommand), 0, (struct sockaddr *)&destAddr, sizeof(destAddr));
@@ -266,8 +237,9 @@ int main()
                                 // Child process closed its stdout, might have exited
                             }
                         }
+
                         // If there's input from the network
-                        else if (FD_ISSET(sockfd, &readfds))
+                        if (FD_ISSET(sockfd, &readfds))
                         {
                             struct sockaddr_in senderAddr;
                             socklen_t senderAddrLen = sizeof(senderAddr);
