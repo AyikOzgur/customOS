@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "mount.h": "c",
-        "stat.h": "c"
+        "stat.h": "c",
+        "in.h": "c"
     }
 }

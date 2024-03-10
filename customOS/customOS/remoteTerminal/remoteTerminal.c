@@ -1,3 +1,7 @@
+/*  This is the app which will run on host machine 
+    to access remoteShell from target
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
