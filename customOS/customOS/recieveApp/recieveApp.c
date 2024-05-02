@@ -10,8 +10,8 @@
 #include <fcntl.h>
 
 // Experimental ports, they should be updated.
-#define SEND_PORT 7033
-#define RECV_PORT 7034
+#define SEND_PORT 7001
+#define RECV_PORT 7002
 
 int main() 
 {
@@ -29,7 +29,7 @@ int main()
     memset(&myAddr, 0, sizeof(myAddr));
     myAddr.sin_family = AF_INET;
     myAddr.sin_port = htons(RECV_PORT);
-    myAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    myAddr.sin_addr.s_addr = inet_addr("192.168.0.2");
 
     if (bind(sockfd, (struct sockaddr *)&myAddr, sizeof(myAddr)) < 0) 
     {
@@ -41,7 +41,7 @@ int main()
     memset(&destAddr, 0, sizeof(destAddr));
     destAddr.sin_family = AF_INET;
     destAddr.sin_port = htons(SEND_PORT);
-    destAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    destAddr.sin_addr.s_addr = inet_addr("192.168.0.3");
 
     int bufferSize = 1024;
     uint8_t* buffer = (uint8_t*)malloc(bufferSize);
@@ -90,8 +90,27 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    receivedBytes = recvfrom(sockfd, executableData, sizeofExecutable, 0, (struct sockaddr *)&destAddr, &destAddrLen);
-    if (receivedBytes != sizeofExecutable) 
+    // Calculate number of buffers.
+    int numberofBuffers = sizeofExecutable / 1400;
+    
+    // Get full packets.
+    for(int i = 0; i < numberofBuffers; ++i)
+    {
+        int bytes = recvfrom(sockfd, &executableData[i * 1400], 1400, 0, (struct sockaddr *)&destAddr, &destAddrLen);
+        if (bytes != 1400) 
+        {
+            perror("Executable data receive failed or incomplete");
+            free(executableData);
+            free(buffer);
+            close(sockfd);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    //  Get last package with non ful size.
+    int lastPacketSize = sizeofExecutable % 1400;
+    int bytes = recvfrom(sockfd, &executableData[numberofBuffers * 1400], lastPacketSize, 0, (struct sockaddr *)&destAddr, &destAddrLen);
+    if (bytes != lastPacketSize) 
     {
         perror("Executable data receive failed or incomplete");
         free(executableData);

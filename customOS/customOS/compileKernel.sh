@@ -37,6 +37,13 @@ scripts/config --enable CONFIG_VIDEO_BCM2835_UNICAM
 # Enable BCM2835 ISP support
 scripts/config --enable CONFIG_VIDEO_BCM2835_ISP
 
+# Enable UVC (USB Video Class) module support
+scripts/config --enable CONFIG_USB_VIDEO_CLASS
+
+# Optionally enable UVC debugging if needed (can be skipped)
+scripts/config --enable CONFIG_USB_VIDEO_CLASS_INPUT_EVDEV
+
+
 scripts/config --enable CONFIG_I2C
 scripts/config --enable CONFIG_I2C_BCM2835
 

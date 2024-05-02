@@ -72,6 +72,12 @@ arm-linux-gnueabihf-gcc -o netto netto.c
 sudo cp netto /mnt/ext4/home/ozgur
 rm ./netto
 
+# go to recieveApp
+cd ../recieveApp
+arm-linux-gnueabihf-gcc -o recieveApp recieveApp.c
+sudo cp recieveApp /mnt/ext4/home/ozgur
+rm ./recieveApp
+
 # prepare sd card device node and then initramfs compressed.
 cd ../../initramfs
 sudo rm -rf ./dev/mmcblk0*
