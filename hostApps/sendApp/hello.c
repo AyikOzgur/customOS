@@ -3,9 +3,11 @@
 #include <unistd.h>
 
 // Function to read and return total CPU usage
-double get_total_cpu_usage() {
+double get_total_cpu_usage() 
+{
     FILE *stat_file = fopen("/proc/stat", "r");
-    if (!stat_file) {
+    if (!stat_file) 
+    {
         perror("Error opening /proc/stat");
         exit(EXIT_FAILURE);
     }
@@ -28,16 +30,19 @@ double get_total_cpu_usage() {
 }
 
 // Function to read and return total memory usage in kilobytes
-unsigned long long get_total_memory_usage() {
+unsigned long long get_total_memory_usage() 
+{
     FILE *meminfo_file = fopen("/proc/meminfo", "r");
-    if (!meminfo_file) {
+    if (!meminfo_file) 
+    {
         perror("Error opening /proc/meminfo");
         exit(EXIT_FAILURE);
     }
 
     char line[256];
     unsigned long long mem_total, mem_free, buffers, cached;
-    while (fgets(line, sizeof(line), meminfo_file)) {
+    while (fgets(line, sizeof(line), meminfo_file)) 
+    {
         if (sscanf(line, "MemTotal: %llu kB", &mem_total) == 1) {}
         else if (sscanf(line, "MemFree: %llu kB", &mem_free) == 1) {}
         else if (sscanf(line, "Buffers: %llu kB", &buffers) == 1) {}
@@ -51,7 +56,8 @@ unsigned long long get_total_memory_usage() {
     return total_memory_usage;
 }
 
-int main() {
+int main() 
+{
     double total_cpu_usage = get_total_cpu_usage();
     unsigned long long total_memory_usage = get_total_memory_usage();
 

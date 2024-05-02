@@ -88,9 +88,12 @@ int main(int argc, char *argv[])
     ackBuffer[ackLen] = '\0';
 
     // Check if the received acknowledgment is "okay"
-    if (strncmp(ackBuffer, "okay", ackLen) == 0) {
+    if (strncmp(ackBuffer, "okay", ackLen) == 0) 
+    {
         printf("Acknowledgment 'okay' received.\n");
-    } else {
+    } 
+    else 
+    {
         printf("Unexpected acknowledgment received.\n");
         close(fileFd);
         close(sockfd);
