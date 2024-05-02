@@ -19,7 +19,7 @@ void startReceiver()
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd < 0)
     {
-        printf("Receiver socket creation failed");
+        printf("Receiver socket creation failed\n");
         exit(EXIT_FAILURE);
     }
 
@@ -30,7 +30,7 @@ void startReceiver()
 
     if (bind(sockfd, (struct sockaddr *)&recvAddr, sizeof(recvAddr)) < 0)
     {
-        printf("Receiver bind failed");
+        printf("Receiver bind failed\n");
         exit(EXIT_FAILURE);
     }
 
@@ -40,7 +40,7 @@ void startReceiver()
         int n = recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&senderAddr, &len);
         if (n < 0)
         {
-            printf("Receiver error");
+            printf("Receiver error\n");
             continue;
         }
         buffer[n] = '\0';
@@ -59,7 +59,7 @@ void startSender()
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd < 0)
     {
-        printf("Sender socket creation failed");
+        printf("Sender socket creation failed\n");
         exit(EXIT_FAILURE);
     }
 
@@ -83,7 +83,7 @@ int main()
     pid_t pid = fork();
     if (pid < 0)
     {
-        printf("fork failed");
+        printf("fork failed\n");
         exit(EXIT_FAILURE);
     }
 

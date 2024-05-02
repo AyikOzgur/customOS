@@ -89,8 +89,6 @@ int main()
         char pwd[1024];
         getcwd(pwd, sizeof(pwd));
         char prompt[2048]; // Make sure this buffer is large enough to hold the resulting string
-        //sprintf(prompt, "myShell @ %s > ", pwd);
-        //sendto(sockfd, prompt, strlen(prompt), 0, (struct sockaddr *)&destAddr, sizeof(destAddr));
 
         struct sockaddr_in senderAddr;
         socklen_t senderAddrLen = sizeof(senderAddr);
@@ -121,7 +119,6 @@ int main()
         if (pipe(parent_to_child) == -1 || pipe(child_to_parent) == -1)
         {
             perror("pipe");
-            // exit(EXIT_FAILURE);
         }
 
         if (argc > 0)
@@ -216,9 +213,7 @@ int main()
                         // Wait for an activity on either stdin or socket
                         if (select(maxfd + 1, &readfds, NULL, NULL, NULL) < 0)
                         {
-                             // Send data read from child's stdout to remote
-                             char error[] = "select error.\n";
-                            sendto(sockfd, error, sizeof(error), 0, (struct sockaddr *)&destAddr, sizeof(destAddr));
+                            perror("select failed");
                             continue;
                         }
 
@@ -257,7 +252,6 @@ int main()
                             }
                         }
                         
-                        // Inside your while loop
                         int status;
                         pid_t result = waitpid(pid, &status, WNOHANG);
                         if (result > 0)

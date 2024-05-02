@@ -58,9 +58,7 @@ void mntrootFilePart()
     // Attempt to mount the /proc filesystem
     if (mount("proc", "/proc", "proc", 0, NULL) != 0)
     {
-        // If something went wrong, print out the error
         printf("Error mounting /proc:");
-        // return EXIT_FAILURE;
     }
     else
     {
@@ -70,9 +68,7 @@ void mntrootFilePart()
     // Attempt to mount the devtmpfs on /dev
     if (mount("devtmpfs", "/dev", "devtmpfs", 0, NULL) != 0)
     {
-        // If something went wrong, print out the error
         printf("Error mounting /dev:\n");
-        // return EXIT_FAILURE;
     }
     else
         printf("/dev has been successfully mounted.\n");
@@ -80,9 +76,7 @@ void mntrootFilePart()
     // Attempt to mount the sysfs on /sys
     if (mount("sysfs", "/sys", "sysfs", 0, NULL) != 0)
     {
-        // If something went wrong, print out the error
         printf("Error mounting /sys\n");
-        // return EXIT_FAILURE;
     }
     else
         printf("/sys has been successfully mounted.\n");
@@ -112,8 +106,7 @@ void setup_network()
     int fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd < 0)
     {
-        perror("Error opening socket");
-        //exit(EXIT_FAILURE);
+        perror("Error opening socket for eth0");
     }
 
     struct ifreq ifr;
@@ -126,40 +119,35 @@ void setup_network()
     {
         perror("Error setting IP address");
         close(fd);
-        //exit(EXIT_FAILURE);
     }
     if (ioctl(fd, SIOCSIFADDR, &ifr) < 0)
     {
         perror("Error setting interface address");
         close(fd);
-        //exit(EXIT_FAILURE);
     }
 
     if (inet_pton(AF_INET, "255.255.255.0", &addr->sin_addr) != 1)
     {
-        perror("Error setting netmask");
+        perror("Error setting netmask\n");
         close(fd);
-        //exit(EXIT_FAILURE);
     }
     if (ioctl(fd, SIOCSIFNETMASK, &ifr) < 0)
     {
         perror("Error setting interface netmask");
         close(fd);
-        //exit(EXIT_FAILURE);
     }
 
     if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0)
     {
         perror("Error getting interface flags");
         close(fd);
-        //exit(EXIT_FAILURE);
     }
+
     ifr.ifr_flags |= IFF_UP | IFF_RUNNING;
     if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0)
     {
-        perror("Error setting interface flags");
+        perror("Error setting interface flags for eth");
         close(fd);
-        //exit(EXIT_FAILURE);
     }
 
     close(fd);
@@ -170,8 +158,7 @@ void setup_loopback()
     int fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd < 0)
     {
-        perror("Error opening socket");
-        //exit(EXIT_FAILURE);
+        perror("Error opening socket for loopback device");
     }
 
     struct ifreq ifr;
@@ -182,23 +169,20 @@ void setup_loopback()
     addr->sin_family = AF_INET;
     if (inet_pton(AF_INET, "127.0.0.1", &addr->sin_addr) != 1)
     {
-        perror("Error setting IP address for lo");
+        perror("Error setting IP address for lo\n");
         close(fd);
-        //exit(EXIT_FAILURE);
     }
 
     if (ioctl(fd, SIOCSIFADDR, &ifr) < 0)
     {
         perror("Error setting interface address for lo");
         close(fd);
-        //exit(EXIT_FAILURE);
     }
 
     if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0)
     {
         perror("Error getting interface flags for lo");
         close(fd);
-        //exit(EXIT_FAILURE);
     }
 
     ifr.ifr_flags |= IFF_UP | IFF_RUNNING;
@@ -206,7 +190,6 @@ void setup_loopback()
     {
         perror("Error setting interface flags for lo");
         close(fd);
-        //exit(EXIT_FAILURE);
     }
 
     close(fd);
@@ -233,16 +216,15 @@ int main()
         return 1;
     }
 
-    char input[MAX_INPUT_SIZE];
-
     while (1)
     {
         pid_t pid = fork();
 
         if (pid == -1)
         {
-            perror("fork");
-            return 1;
+            perror("fork failed failed from init.... It will be tried again in 1 second");
+            sleep(1);
+            continue;
         }
         else if (pid == 0)
         {
@@ -264,10 +246,11 @@ int main()
             int status = execve(path, argv, envp);
             if (status == -1)
             {
-                perror("execve failed");
+                perror("Cant run remoteShell");
             }
-            printf("this message should not be seen");
 
+            /// Child process that runs remoteShell should not reach here.
+            sleep(1);
             exit(0); // Terminate the child process
         }
         else

@@ -64,7 +64,8 @@ int main()
     // Assuming buffer contains the string "123:appExecutableName"
     int sizeofExecutable;
     char* colonPtr = strchr(buffer, ':'); // Find the colon in the buffer
-    if (colonPtr == NULL) {
+    if (colonPtr == NULL) 
+    {
         perror("Format error: No colon found");
         exit(EXIT_FAILURE);
     }
@@ -76,7 +77,6 @@ int main()
     // Print the size and name of the executable
     printf("Size of executable: %d bytes\n", sizeofExecutable);
     printf("Name of executable: %s\n", nameOfExecutable);
-
 
     const char* ackMessage = "okay";
     sendto(sockfd, ackMessage, strlen(ackMessage), 0, (struct sockaddr *)&destAddr, destAddrLen);

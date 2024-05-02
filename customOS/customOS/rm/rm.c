@@ -34,7 +34,8 @@ void remove_directory(const char *path)
             if (S_ISDIR(statbuf.st_mode))
             {
                 remove_directory(full_path);
-            } else 
+            } 
+            else 
             {
                 if (unlink(full_path) != 0)
                 {

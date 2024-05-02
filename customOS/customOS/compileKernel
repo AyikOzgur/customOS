@@ -4,7 +4,7 @@ linuxPath=/home/ozgur/linux
 
 cd $linuxPath
 
-make -j16 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- clean all
+make -j16 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- clean
 
 # Prepare default configuration
 KERNEL=kernel7
@@ -72,4 +72,3 @@ sudo cp arch/arm/boot/dts/overlays/*.dtb* mnt/fat32/overlays/
 sudo cp arch/arm/boot/dts/overlays/README mnt/fat32/overlays/
 sudo umount mnt/fat32
 sudo umount mnt/ext4
-

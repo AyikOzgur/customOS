@@ -4,11 +4,8 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 
-
 #define MAX_INPUT_SIZE 1024
 #define MAX_ARGS 64
-#define SEND_PORT 7033
-#define RECV_PORT 7034
 
 int main()
 {
@@ -30,7 +27,6 @@ int main()
 
     // Pid of child.
     pid_t pid;
-
 
     while (1)
     {

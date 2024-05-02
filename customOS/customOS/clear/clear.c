@@ -10,6 +10,6 @@ void clear_screen()
 
 int main()
 {
-    clear_screen(); // Clear the screen
+    clear_screen();
     return 0;
 }
