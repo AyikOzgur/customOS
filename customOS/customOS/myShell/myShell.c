@@ -11,21 +11,12 @@ int main()
 {
     char input[MAX_INPUT_SIZE];
 
-    // Define the library path you want to set
     const char *libraryPath = "/lib";
-
-    // Create a string with the new LD_LIBRARY_PATH value
     char ldLibraryPath[1024];
     snprintf(ldLibraryPath, sizeof(ldLibraryPath), "LD_LIBRARY_PATH=%s", libraryPath);
-
-    // Set the environment variable using putenv
     if (putenv(ldLibraryPath) != 0)
-    {
-        perror("putenv");
-        return 1;
-    }
+        perror("LD_LIBRARY_PATH could not set.");
 
-    // Pid of child.
     pid_t pid;
 
     while (1)
@@ -65,17 +56,13 @@ int main()
                 if (args[1] != NULL)
                 {
                     if (chdir(args[1]) == -1)
-                    {
-                        perror("chdir");
-                    }
+                        printf("Can't change directory to %s\n", args[1]);
                 }
                 else
                 {
                     // Handle 'cd' with no arguments as 'cd ~'
                     if (chdir(getenv("HOME")) == -1)
-                    {
-                        perror("chdir");
-                    }
+                        perror("Can't change directory to home");
                 }
             }
             else
@@ -84,17 +71,17 @@ int main()
 
                 if (pid == -1)
                 {
-                    perror("fork");
-                    return 1;
+                    perror("fork failed.");
+                    continue;
                 }
                 else if (pid == 0)
                 {
                     // Check if the executable is in the current directory
-                    char current_dir_path[1024];
-                    snprintf(current_dir_path, sizeof(current_dir_path), "./%s", args[0]);
-                    if (access(current_dir_path, X_OK) == 0)
+                    char currentDirPath[1024];
+                    snprintf(currentDirPath, sizeof(currentDirPath), "./%s", args[0]);
+                    if (access(currentDirPath, X_OK) == 0)
                     {
-                        execvp(current_dir_path, args);
+                        execvp(currentDirPath, args);
                     }
                     else
                     {

@@ -67,6 +67,8 @@ int main()
     if (colonPtr == NULL) 
     {
         perror("Format error: No colon found");
+        free(buffer);
+        close(sockfd);
         exit(EXIT_FAILURE);
     }
 
@@ -91,10 +93,10 @@ int main()
     }
 
     // Calculate number of buffers.
-    int numberofBuffers = sizeofExecutable / 1400;
+    int numberOfBuffers = sizeofExecutable / 1400;
     
     // Get full packets.
-    for(int i = 0; i < numberofBuffers; ++i)
+    for(int i = 0; i < numberOfBuffers; ++i)
     {
         int bytes = recvfrom(sockfd, &executableData[i * 1400], 1400, 0, (struct sockaddr *)&destAddr, &destAddrLen);
         if (bytes != 1400) 
@@ -109,7 +111,7 @@ int main()
 
     //  Get last package with non ful size.
     int lastPacketSize = sizeofExecutable % 1400;
-    int bytes = recvfrom(sockfd, &executableData[numberofBuffers * 1400], lastPacketSize, 0, (struct sockaddr *)&destAddr, &destAddrLen);
+    int bytes = recvfrom(sockfd, &executableData[numberOfBuffers * 1400], lastPacketSize, 0, (struct sockaddr *)&destAddr, &destAddrLen);
     if (bytes != lastPacketSize) 
     {
         perror("Executable data receive failed or incomplete");

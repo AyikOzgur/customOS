@@ -25,34 +25,27 @@ int main()
 
     char command[MAX_INPUT_SIZE];
 
-    // Define the library path you want to set
     const char *libraryPath = "/lib";
-
-    // Create a string with the new LD_LIBRARY_PATH value
     char ldLibraryPath[1024];
     snprintf(ldLibraryPath, sizeof(ldLibraryPath), "LD_LIBRARY_PATH=%s", libraryPath);
-
-    // Set the environment variable using putenv
     if (putenv(ldLibraryPath) != 0)
     {
         perror("putenv");
         return 1;
     }
 
-    // Socket file descripter.
     int sockfd;
-    // My address to bind for recieving data.
     struct sockaddr_in myAddr;
+
     // Pipes for directing child process in and out
     int parent_to_child[2], child_to_parent[2];
-    // Pid of child.
+    
     pid_t pid;
 
-    // Create socket.
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd < 0)
     {
-        perror("Sender socket creation failed");
+        perror("Socket creation failed");
     }
 
     // Set up my address for receiving data
@@ -64,10 +57,10 @@ int main()
     // Bind the socket to the port for receiving data
     if (bind(sockfd, (struct sockaddr *)&myAddr, sizeof(myAddr)) < 0)
     {
-        perror("Bind failed");
+        perror("Receiver socket binding failed");
     }
 
-    // Prepare destionation address of remote connection.
+    // Prepare destination address of remote connection.
     struct sockaddr_in destAddr;
     memset(&destAddr, 0, sizeof(destAddr));
     destAddr.sin_family = AF_INET;
@@ -128,17 +121,13 @@ int main()
                 if (args[1] != NULL)
                 {
                     if (chdir(args[1]) == -1)
-                    {
-                        perror("chdir");
-                    }
+                        printf("Can't change directory to %s\n", args[1]);
                 }
                 else
                 {
                     // Handle 'cd' with no arguments as 'cd ~'
                     if (chdir(getenv("HOME")) == -1)
-                    {
-                        perror("chdir");
-                    }
+                        perror("Cant change directory to HOME");
                 }
             }
             else if(strcmp(args[0], "clear") == 0)
@@ -157,7 +146,6 @@ int main()
                 }
                 else if (pid == 0)
                 {
-                    // give so small sleep
                     nanosleep(&ts, NULL);
 
                     close(parent_to_child[1]); // Close unused write end
@@ -187,7 +175,7 @@ int main()
                             printf("Invalid command.\n");
                         }
                     }
-                    // give so small sleep
+                    
                     nanosleep(&ts, NULL);
                     exit(0); // Terminate the child process
                 }

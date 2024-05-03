@@ -26,5 +26,5 @@ int main()
         fflush(stdout);
     }
 
-    return 0; // Successful execution
+    return 0;
 }

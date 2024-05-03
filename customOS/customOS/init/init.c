@@ -20,7 +20,7 @@
 #define MAX_INPUT_SIZE 1024
 #define MAX_ARGS 64
 
-void mntrootFilePart()
+void mountRootFileSystem()
 {
     // mount main root file system
     const char *source = "/dev/mmcblk0p2";
@@ -32,22 +32,18 @@ void mntrootFilePart()
 
     // Create the target mount directory with appropriate permissions
     if (mkdir(target, 0755) != 0)
-    {
-        perror("mkdir failed");
-    }
+        perror("/mnt could not created.");
 
     // Attempt to mount the device
     if (mount(source, target, filesystemtype, mountflags, data) != 0)
-    {
-        perror("mount failed");
-    }
+        perror("ext4 partition could not mounted to /mnt");
     else
         printf("Mounted %s to %s\n", source, target);
 
     // Change root
     if (chroot("/mnt") < 0)
     {
-        perror("chroot");
+        perror("Root file system could not switched.");
     }
     else
     {
@@ -57,34 +53,25 @@ void mntrootFilePart()
 
     // Attempt to mount the /proc filesystem
     if (mount("proc", "/proc", "proc", 0, NULL) != 0)
-    {
-        printf("Error mounting /proc:");
-    }
+        perror("Error mounting /proc");
     else
-    {
         printf("proc mounted.");
-    }
 
     // Attempt to mount the devtmpfs on /dev
     if (mount("devtmpfs", "/dev", "devtmpfs", 0, NULL) != 0)
-    {
-        printf("Error mounting /dev:\n");
-    }
+        perror("Error mounting /dev");
     else
         printf("/dev has been successfully mounted.\n");
 
     // Attempt to mount the sysfs on /sys
     if (mount("sysfs", "/sys", "sysfs", 0, NULL) != 0)
-    {
-        printf("Error mounting /sys\n");
-    }
+        perror("Error mounting /sys\n");
     else
         printf("/sys has been successfully mounted.\n");
 }
 
-void mntbootPart()
+void mountBootPartition()
 {
-    // mount main root file system
     const char *source = "/dev/mmcblk0p1";
     const char *target = "/boot";
     const char *filesystemtype = "vfat";
@@ -94,20 +81,16 @@ void mntbootPart()
 
     // Attempt to mount the device
     if (mount(source, target, filesystemtype, mountflags, data) != 0)
-    {
-        perror("mount failed");
-    }
+        perror("fat32 partition could not mounted to /boot");
     else
         printf("Mounted %s to %s\n", source, target);
 }
 
-void setup_network()
+void setupEth0()
 {
     int fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd < 0)
-    {
         perror("Error opening socket for eth0");
-    }
 
     struct ifreq ifr;
     strcpy(ifr.ifr_name, "eth0");
@@ -153,13 +136,11 @@ void setup_network()
     close(fd);
 }
 
-void setup_loopback()
+void setupLo()
 {
     int fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd < 0)
-    {
         perror("Error opening socket for loopback device");
-    }
 
     struct ifreq ifr;
     memset(&ifr, 0, sizeof(ifr));
@@ -197,24 +178,19 @@ void setup_loopback()
 
 int main()
 {
-    mntrootFilePart();
-    mntbootPart();
-    setup_network();
-    setup_loopback();
+    mountRootFileSystem();
+    mountBootPartition();
+    setupEth0();
+    setupLo();
 
-    // Define the library path you want to set
+    /* It will be enough for now to have only /lib for dynamic linker
+        since we dont have anything except libc.
+    */
     const char *libraryPath = "/lib";
-
-    // Create a string with the new LD_LIBRARY_PATH value
     char ldLibraryPath[1024];
     snprintf(ldLibraryPath, sizeof(ldLibraryPath), "LD_LIBRARY_PATH=%s", libraryPath);
-
-    // Set the environment variable using putenv
     if (putenv(ldLibraryPath) != 0)
-    {
-        perror("putenv");
-        return 1;
-    }
+        perror("LD_LIBRARY_PATH could not set.");
 
     while (1)
     {
@@ -228,37 +204,23 @@ int main()
         }
         else if (pid == 0)
         {
-            // Child process
-            // Check if the executable is in /bin
-            // Path to the executable you want to run
             char *path = "/bin/remoteShell";
-
-            // Arguments array for execve must be terminated by a NULL pointer
-            // Since your executable doesn't require arguments, only include the program name
             char *argv[] = {path, NULL};
-
-            // Environment variables array, also terminated by a NULL pointer
-            // If you don't need to set any specific environment variables, you can just pass NULL
             char *envp[] = {NULL};
 
-            // Use execve to execute the program
             // Note: execve does not return on success, the current program is replaced
             int status = execve(path, argv, envp);
             if (status == -1)
-            {
                 perror("Cant run remoteShell");
-            }
 
-            /// Child process that runs remoteShell should not reach here.
+            // Child process that runs remoteShell should not reach here.
             sleep(1);
-            exit(0); // Terminate the child process
+            exit(0); // Terminate the child process.
         }
         else
         {
-            // Parent process
             int status;
             waitpid(pid, &status, 0);
-            // The parent continues to run after the child process finishes.
         }
     }
 

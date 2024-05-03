@@ -8,7 +8,6 @@ int main(int argc, char *argv[])
     // Iterate over command line arguments (file paths)
     for (int i = 1; i < argc; i++)
     {
-        // Open the file
         file = fopen(argv[i], "r");
         if (file == NULL)
         {
@@ -22,7 +21,6 @@ int main(int argc, char *argv[])
             putchar(c);
         }
 
-        // Close the file
         fclose(file);
     }
 

@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <stdlib.h>
 
-void _ls(const char *dir, int op_a, int op_l)
+void ls(const char *dir, int op_a, int op_l)
 {
 	// Here we will list the directory
 	struct dirent *d;
@@ -11,15 +11,9 @@ void _ls(const char *dir, int op_a, int op_l)
 	if (!dh)
 	{
 		if (errno = ENOENT)
-		{
-			// If the directory is not found
 			perror("Directory doesn't exist");
-		}
 		else
-		{
-			// If the directory is not readable then throw error and exit
 			perror("Unable to read directory");
-		}
 		exit(EXIT_FAILURE);
 	}
 	// While the next entry is not readable we will print directory files
@@ -41,7 +35,7 @@ int main(int argc, const char *argv[])
 	int op_a = 0, op_l = 0;
 	if (argc == 1)
 	{
-		_ls(".", 0, 0);
+		ls(".", 0, 0);
 	}
 	else if (argc == 2)
 	{
@@ -63,7 +57,7 @@ int main(int argc, const char *argv[])
 				}
 				p++;
 			}
-			_ls(".", op_a, op_l);
+			ls(".", op_a, op_l);
 		}
 	}
 	return 0;
