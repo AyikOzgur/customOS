@@ -1,0 +1,37 @@
+// create file system folders
+
+    mkdir -p initramfs/{bin,sbin,etc,proc,sys,usr/bin,usr/sbin}
+
+// put executable init under initramfs folder.
+
+// create device nodes for partitios of sd card
+
+```
+mknod /dev/mmcblk0 b 179 0
+mknod /dev/mmcblk0p1 b 179 1
+mknod /dev/mmcblk0p2 b 179 2
+```
+
+// create compressed version of initramfs 
+
+    find . | cpio -o -H newc | gzip > ../initramfs.img.gz
+
+// configure config.txt
+```
+enable_uart=1
+initramfs initramfs.img.gz followkernel
+kernel=kernel7.img
+hdmi_force_hotplug=1
+hdmi_group=1
+hdmi_mode=1
+```
+
+// configure cmdline.txt
+```
+console=serial0,115200
+```
+
+
+Kernel will boot and mount initramfs file system and then it will
+run init executable which you put under initramfs. This init will mount second partion and set as 
+root ("/") partiton.
