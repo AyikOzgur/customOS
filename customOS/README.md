@@ -27,7 +27,7 @@
 
 # Overview
 
-CustomOS is a minimalist, customized operating system designed for FUN. There are some build systems to create an customized linux OS. Custom OS does not aim to compete with any of them. If the developer is planing to obtain a stable OS with advance features, this project will not help in short time. However, if developer wants to get her/his hands dirty with linux and C programming. CustomOS can be interesting. Main purpose of this repository is building a linux OS by using only "Linux kernel" and "Compiler" for boards like Raspberry pi. 
+CustomOS is a minimalist, customized operating system designed for FUN. There are some build systems to create an customized linux OS. Custom OS can not compete with any of them. If the developer is planing to obtain a stable OS with advance features, this project will not help in short time. However, if developer wants to get her/his hands dirty with linux and C programming and have fun, CustomOS can be interesting. Main purpose of this repository is building a tiny linux OS by using only "Linux kernel" and "Compiler" for boards like Raspberry pi. 
 
 Key Features:
 - Utilizes only the Linux kernel and C implementations.
@@ -105,7 +105,7 @@ sudo umount mnt/ext4
 
 # Setup before first boot
 
-In previous section we have managed to compile linux kernel and prepare basic bootable sd card. However, there are a few more steps before booting. First step is connecting raspberry pi to our host machine via uart-serial converter. I wont get in detailts of this step since it is basic and straight forward. More important part I would like to mention is that having proper **config.txt** and **cmdline.txt** files. **config.txt** is used by raspberry pi firmware before booting kernel and **cmdline.txt** is used by kernel. We should enable uart and configure it properly to see kernel outputs. These file will be changed in future but now we can have simplest versions. 
+In previous section we have managed to compile linux kernel and prepare basic bootable sd card. However, there are a few more steps before booting. First step is connecting raspberry pi to our host machine via uart-serial converter. I wont get in details of this step since it is basic and straight forward. More important part I would like to mention is that having proper **config.txt** and **cmdline.txt** files. **config.txt** is used by raspberry pi firmware before booting kernel and **cmdline.txt** is used by kernel. We should enable uart and configure it properly to see kernel outputs. These files will be changed in future but now we can have simplest versions. 
 
 **config.txt**
 ```xml
