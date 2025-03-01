@@ -1,6 +1,0 @@
-enable_uart=1
-initramfs initramfs.img.gz followkernel
-kernel=kernel7.img
-hdmi_force_hotplug=1
-hdmi_group=1
-hdmi_mode=1

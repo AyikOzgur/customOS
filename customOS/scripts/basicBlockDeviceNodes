@@ -1,0 +1,16 @@
+#!/bin/sh
+
+targetRootFile=<Enter target rool file>
+
+sudo rm -rf ${targetRootFile}/dev/mmcblk0*
+sudo mknod ${targetRootFile}/dev/mmcblk0 b 179 0
+sudo mknod ${targetRootFile}/dev/mmcblk0p1 b 179 1
+sudo mknod ${targetRootFile}/dev/mmcblk0p2 b 179 2
+sudo chmod 660 ${targetRootFile}/dev/mmcblk0p*
+
+sudo mknod ${targetRootFile}/dev/stdin c 1 0
+sudo chmod 666 ${targetRootFile}/dev/stdin
+sudo mknod ${targetRootFile}/dev/stdout c 1 1
+sudo chmod 666 ${targetRootFile}/dev/stdout
+sudo mknod ${targetRootFile}/dev/stderr c 1 2
+sudo chmod 666 ${targetRootFile}/dev/stderr

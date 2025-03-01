@@ -1,0 +1,11 @@
+#!/bin/sh
+
+mkdir -p initramfs/{bin,sbin,etc,proc,sys,usr/bin,usr/sbin}
+
+# Put whatever you want into initramfs
+
+# create initramfs compressed file.
+find . | cpio -o -H newc | gzip > ../initramfs.img.gz
+cd ..
+cp initramfs.img.gz /mnt/fat32
+rm -rf ./initramfs.img.gz
