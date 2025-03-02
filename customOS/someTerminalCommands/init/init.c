@@ -192,7 +192,7 @@ int main()
 
     // Attempt to mount the sysfs on /sys
     if (mount("sysfs", "/sys", "sysfs", 0, NULL) != 0)
-       error("Error mounting /sys\n");
+        perror("Error mounting /sys\n");
 
     while (1)
     {

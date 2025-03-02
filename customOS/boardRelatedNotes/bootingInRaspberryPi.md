@@ -1,14 +1,14 @@
 # Raspberry Pi Boot Process
 
-The Raspberry Pi's default bootloader can directly boot the kernel without requiring an additional bootloader like **U-Boot**. This simplifies the boot process and reduces boot time.
+The Raspberry Pi's default bootloader can directly boot the kernel without requiring an additional bootloader like **U-Boot**.
 
 ## Bootloader Files
 
 To boot successfully, the following essential bootloader binaries must be copied to the **boot partition (FAT32)**:
 
-- `bootcode.bin` – Bootloader responsible for initializing the system.
-- `fixup.dat` – Provides necessary firmware adjustments.
-- `start.elf` – The GPU firmware that loads and starts the kernel.
+- `bootcode.bin`
+- `fixup.dat`
+- `start.elf`
 
 ## Configuration Files
 
