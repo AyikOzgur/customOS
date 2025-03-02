@@ -9,15 +9,11 @@
 
 int main()
 {
-    char input[MAX_INPUT_SIZE];
-
-    const char *libraryPath = "/lib";
-    char ldLibraryPath[1024];
-    snprintf(ldLibraryPath, sizeof(ldLibraryPath), "LD_LIBRARY_PATH=%s", libraryPath);
-    if (putenv(ldLibraryPath) != 0)
-        perror("LD_LIBRARY_PATH could not set.");
+    setenv("HOME", "/", 1);
+    //setenv("LD_LIBRARY_PATH", "/lib", 1); // Kernel panics.
 
     pid_t pid;
+    char input[MAX_INPUT_SIZE];
 
     while (1)
     {
@@ -25,7 +21,7 @@ int main()
         getcwd(pwd, sizeof(pwd));
         printf("myShell @ %s > ", pwd);
         fflush(stdout);
-        
+
         // Get command and arguments.
         if (fgets(input, sizeof(input), stdin) == NULL) 
         {

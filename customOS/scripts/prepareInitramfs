@@ -7,5 +7,7 @@ mkdir -p initramfs/{bin,sbin,etc,proc,sys,usr/bin,usr/sbin}
 # create initramfs compressed file.
 find . | cpio -o -H newc | gzip > ../initramfs.img.gz
 cd ..
-cp initramfs.img.gz /mnt/fat32
+
+# Copy to boot partition.
+cp initramfs.img.gz <boot partition path>
 rm -rf ./initramfs.img.gz

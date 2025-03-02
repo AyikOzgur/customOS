@@ -16,10 +16,10 @@
 #include <sys/mman.h>
 #include <errno.h>
 
-
 #define MAX_INPUT_SIZE 1024
 #define MAX_ARGS 64
 
+/// @brief This might be usefull when iniramfs is used.
 void mountRootFileSystem()
 {
     // mount main root file system
@@ -103,6 +103,7 @@ void setupEth0()
         perror("Error setting IP address");
         close(fd);
     }
+
     if (ioctl(fd, SIOCSIFADDR, &ifr) < 0)
     {
         perror("Error setting interface address");
@@ -178,19 +179,20 @@ void setupLo()
 
 int main()
 {
+/*
     mountRootFileSystem();
-    mountBootPartition();
     setupEth0();
     setupLo();
+*/
+    mountBootPartition();
 
-    /* It will be enough for now to have only /lib for dynamic linker
-        since we dont have anything except libc.
-    */
-    const char *libraryPath = "/lib";
-    char ldLibraryPath[1024];
-    snprintf(ldLibraryPath, sizeof(ldLibraryPath), "LD_LIBRARY_PATH=%s", libraryPath);
-    if (putenv(ldLibraryPath) != 0)
-        perror("LD_LIBRARY_PATH could not set.");
+    // Attempt to mount the /proc filesystem
+    if (mount("proc", "/proc", "proc", 0, NULL) != 0)
+        perror("Error mounting /proc\n");
+
+    // Attempt to mount the sysfs on /sys
+    if (mount("sysfs", "/sys", "sysfs", 0, NULL) != 0)
+       error("Error mounting /sys\n");
 
     while (1)
     {
@@ -204,14 +206,14 @@ int main()
         }
         else if (pid == 0)
         {
-            char *path = "/bin/remoteShell";
+            char *path = "/bin/myShell";
             char *argv[] = {path, NULL};
             char *envp[] = {NULL};
 
             // Note: execve does not return on success, the current program is replaced
             int status = execve(path, argv, envp);
             if (status == -1)
-                perror("Cant run remoteShell");
+                perror("Cant run myShell");
 
             // Child process that runs remoteShell should not reach here.
             sleep(1);
