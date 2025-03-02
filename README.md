@@ -108,7 +108,7 @@ mkimage -A arm64 -T script -C none -n "Boot Script" -d boot.cmd boot.scr
 End then copy boot.scr into boot partition. U-boot will find it from there when boot is started. 
 
 # Compiling glic 
-Another crucial component of a linux system of course C libraries. 
+Another crucial component of a linux system is,  Of course C libraries. 
 
 1. Obtain source code of glibc from [website](https://ftp.gnu.org/gnu/glibc/) and extract it.
 2. Following script shows a simple way of cross compiling glibc :
