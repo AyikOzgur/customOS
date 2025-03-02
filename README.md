@@ -107,7 +107,52 @@ mkimage -A arm64 -T script -C none -n "Boot Script" -d boot.cmd boot.scr
 ```
 End then copy boot.scr into boot partition. U-boot will find it from there when boot is started. 
 
+# Compiling glic 
+Another crucial component of a linux system of course C libraries. 
 
+1. Obtain source code of glibc from [website](https://ftp.gnu.org/gnu/glibc/) and extract it.
+2. Following script shows a simple way of cross compiling glibc :
+    ```bash
+    #!/bin/bash
+
+    set -e  # Exit immediately on error
+
+    # Define environment variables
+    export TARGET=aarch64-linux-gnu
+    export PREFIX=<Enter target rootfs>
+    export SYSROOT=/usr/$TARGET
+    export PATH=$PREFIX/bin:$PATH
+
+    # Ensure the compiler exists
+    if ! command -v ${TARGET}-gcc &> /dev/null; then
+        echo "Error: Cross compiler ($TARGET-gcc) not found!"
+        exit 1
+    fi
+
+    # Create install directory
+    mkdir -p $PREFIX
+
+    # Define cross-compiler
+    export CC=${TARGET}-gcc
+    export CXX=${TARGET}-g++
+    export AR=${TARGET}-ar
+    export RANLIB=${TARGET}-ranlib
+
+    # Create and enter build directory
+    mkdir -p build
+    cd build
+
+    # Configure Glibc for cross-compilation
+    ../configure --host=$TARGET \
+        --build=$(../scripts/config.guess) \
+        --target=$TARGET \
+        --prefix=$PREFIX \
+        --with-headers=$SYSROOT/include \
+    
+    # Compile Glibc
+    make -j$(nproc)
+    make install
+    ```
 
 # Initramfs 
 

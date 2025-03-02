@@ -9,6 +9,13 @@
 
 int main()
 {
+    // Temporary solution for LD_LIBRARY_PATH. @todo: Find problem of setenv for LD_LIBRARY_PATH.
+    const char *libraryPath = "/lib";
+    char ldLibraryPath[1024];
+    snprintf(ldLibraryPath, sizeof(ldLibraryPath), "LD_LIBRARY_PATH=%s", libraryPath);
+    if (putenv(ldLibraryPath) != 0)
+        perror("LD_LIBRARY_PATH could not set.");
+
     setenv("HOME", "/", 1);
     //setenv("LD_LIBRARY_PATH", "/lib", 1); // Kernel panics.
 
